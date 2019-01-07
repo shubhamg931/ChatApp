@@ -6,11 +6,11 @@
     <title>Chat System</title>
     <script	src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <!-- Compiled and minified CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 
-<!-- Compiled and minified JavaScript -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <script src="/../socket.io/socket.io.js"></script>
 
@@ -20,14 +20,14 @@
       <h4>Welcome to Skill India App</h4>
       <br>
       <div class="row">
-        <div class="col m6 #f1f1f1">
-          <ul id="chat" class="collection left-align">
+        <div class="col m6 #f1f1f1 s12">
+          <ul id="chat" class="collection left-align" style="height: 400px; overflow: auto">
             <li class="collection-item"><strong>Chat</strong></li>
             <li style="border-left: 5px solid red;" class="collection-item"><strong>SkillIndia:</strong> Welcome to the Skill India Chat Service</li>
-            <br><br><br><br>
+            <br><br>
           </ul>
           <form id="msgform" name="msgform">
-            <div class="row">
+            <div class="row" style="margin-bottom: 0">
               <div class="col s9">
                 <div class="input-field">
                   <textarea id="icon_prefix2" class="materialize-textarea"></textarea>
@@ -36,12 +36,18 @@
               </div>
               <div class="col s3">
                 <button type="submit" style="margin-top:15px" class="btn-floating btn-large waves-effect waves-light #009688"><i class="material-icons">send</i></button>
+
               </div>
             </div>
-
+            <p style="text-align: right">
+              <label for="check">
+                <input type="checkbox" id="check" class="filled-in" checked="checked" />
+                <span>Enter is Send</span>
+              </label>
+            </p>
           </form>
         </div>
-        <div class="collection col m6" style="width:100%;">
+        <div class="collection col m6 s12">
           <h4>Online Users</h4>
           <br>
           <div class="row">
@@ -56,14 +62,6 @@
         </div>
       </div>
     </div>
-
-    <div class="row">
-  <form class="col s12">
-    <div class="row">
-
-    </div>
-  </form>
-</div>
   </body>
   <script type="text/javascript">
     var color;
@@ -78,14 +76,30 @@
       var send = $("#send");
       var users = $("#users");
       var username = window.prompt("Enter Your Name");
-      if(username === '' || username === 'null')
+      if(username == '' || username == 'null')
         username = "Anonymous";
       socket.emit("new user", username, function(data){
       });
 
+      var sendCheck = $('#check');
+      $(document).keypress(function(e) {
+        var keycode = (e.keyCode ? e.keyCode : e.which);
+        if (keycode == '13') {
+          // alert('You pressed enter! - keypress');
+          if (sendCheck[0].checked) {
+            if (msg.val()) {
+              socket.emit("send message", msg.val());
+            }
+            msg.val("");
+          }
+        }
+      });
+
       msgform.submit(function(e){
         e.preventDefault();
-        socket.emit("send message", msg.val());
+        if(msg.val().length) {
+          socket.emit("send message", msg.val());
+        }
         msg.val("");
       });
 
