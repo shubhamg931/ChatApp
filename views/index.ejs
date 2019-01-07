@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>Chat System</title>
+    <script	src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <!-- Compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<!-- Compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+
+    <script src="/../socket.io/socket.io.js"></script>
+
+  </head>
+  <body>
+    <div class="container center">
+      <h4>Welcome to Skill India App</h4>
+      <br>
+      <div class="row">
+        <div class="col m6 #f1f1f1">
+          <ul id="chat" class="collection left-align">
+            <li class="collection-item"><strong>Chat</strong></li>
+            <li style="border-left: 5px solid red;" class="collection-item"><strong>SkillIndia:</strong> Welcome to the Skill India Chat Service</li>
+            <br><br><br><br>
+          </ul>
+          <form id="msgform" name="msgform">
+            <div class="row">
+              <div class="col s9">
+                <div class="input-field">
+                  <textarea id="icon_prefix2" class="materialize-textarea"></textarea>
+                  <label for="icon_prefix2">Type Your Message Here</label>
+                </div>
+              </div>
+              <div class="col s3">
+                <button type="submit" style="margin-top:15px" class="btn-floating btn-large waves-effect waves-light #009688"><i class="material-icons">send</i></button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+        <div class="collection col m6" style="width:100%;">
+          <h4>Online Users</h4>
+          <br>
+          <div class="row">
+            <div class="col s6">
+              <strong><p>Admins</p></strong>
+              <p>Shubham Gupta</p>
+            </div>
+            <div id="users" class="col s6">
+              <strong><p>Users</p></strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+  <form class="col s12">
+    <div class="row">
+
+    </div>
+  </form>
+</div>
+  </body>
+  <script type="text/javascript">
+    var color;
+    $(window).on("load", function(){
+    });
+
+    $(function(){
+      var socket = io.connect();
+      var msgform = $("#msgform");
+      var msg = $("#icon_prefix2");
+      var chat = $("#chat");
+      var send = $("#send");
+      var users = $("#users");
+      var username = window.prompt("Enter Your Name");
+      if(username === '' || username === 'null')
+        username = "Anonymous";
+      socket.emit("new user", username, function(data){
+      });
+
+      msgform.submit(function(e){
+        e.preventDefault();
+        socket.emit("send message", msg.val());
+        msg.val("");
+      });
+
+      socket.on("new message", function(data){
+        chat.append('<li style="border-left: 5px solid '+ data.color +';" class="collection-item"><strong>'+ data.naam +'</strong>: '+ data.msg +'</li>');
+      });
+
+      socket.on("get users", function(data){
+        var html = "<strong><p>Users</p></strong>";
+        for(i=0;i<data.length;++i){
+          html +=  '<p>' + data[i] + '</p>';
+        }
+        users.html(html);
+      })
+    });
+
+  </script>
+</html>
